@@ -1,7 +1,3 @@
-if(!require(ggplot2)) {
-        install.packages("ggplot2")
-}
-
 URL <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
 
 if (!file.exists("./tmp"))

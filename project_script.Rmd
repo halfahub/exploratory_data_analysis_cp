@@ -128,7 +128,7 @@ Source type POINT shown strong increase during the years 1999-2005, changed to s
 ### 4. Across the United States, how have emissions from coal combustion-related sources changed from 1999–2008?
 
 ```{r cache=TRUE}
-coalSources <- SCC[grep("coal",SCC$Short.Name,ignore.case = TRUE),c("SCC","Short.Name")]
+coalSources <- SCC[grep("coal",SCC$EI.Sector,ignore.case = TRUE),c("SCC","Short.Name")]
 coalEmissions <- NEI[NEI$SCC %in% coalSources$SCC,]
 coalTortalEmissions <- with(coalEmissions, tapply(Emissions/1000,year,sum,na.rm=TRUE))
 ```
@@ -151,9 +151,9 @@ Coal combustion-related emissions decreased by half by 2008 compared to 1999, sh
 ### 5. How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City?
 
 ```{r cache=TRUE}
-motorSources <- SCC[grep("motor",SCC$Short.Name,ignore.case = TRUE),c("SCC","Short.Name")]
+motorSources <- SCC[grep("motor|vehicle",SCC$EI.Sector, ignore.case = TRUE),c("SCC","Short.Name")]
 baltimoreMotorEmissions <- NEI[NEI$SCC %in% motorSources$SCC & NEI$fips == "24510",]
-baltimoreToatalMotorEmissions <- with(coalEmissions, tapply(Emissions/1000,year,sum,na.rm=TRUE))
+baltimoreToatalMotorEmissions <- with(baltimoreMotorEmissions, tapply(Emissions,year,sum,na.rm=TRUE))
 ```
 
 ```{r echo=FALSE}
@@ -161,7 +161,7 @@ par(mar = c(5, 5, 5, 1))
 barplot(
         baltimoreToatalMotorEmissions,
         xlab = "Year",
-        ylab = "Motor emissions, 1000 tonn",
+        ylab = "Motor vehicle PM2.5 emissions, tonn",
         main = "Total PM2.5 emissions in in Baltimore,
         from Motor vehicle sources
         for the years 1999, 2002, 2005, and 2008"
@@ -170,11 +170,58 @@ invisible(dev.copy(png, filename = "Plot5.png"))
 invisible(dev.off())
 ```
 
-Emissions from motor vehicle sources in Baltimore City remained almost on the same level up to year 2005 except slight decrease in 2002. However in 2008 situation has changed dramatically when it has shown sharp fall by one third at once. 
+Motor vehicle emissions in Baltimore has shown a sharp decline in 2002 by about 60% compared to 1999. However, since 2002, the dynamics changed and by 2005 the levels had not changed, only in 2008 there was a significant decrease
 
 
 ### 6. Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in Los Angeles County, California (𝚏𝚒𝚙𝚜 == "𝟶𝟼𝟶𝟹𝟽"). Which city has seen greater changes over time in motor vehicle emissions?
 
-```{r}
-
+```{r cache=TRUE}
+losangelesMotorEmissions <-
+        NEI[NEI$SCC %in% motorSources$SCC &
+                    NEI$fips == "06037", ]
+twocityMotorEmissions <-
+        rbind (losangelesMotorEmissions, baltimoreMotorEmissions)
+twocityMotorEmissionsByFips <-
+        aggregate(
+                twocityMotorEmissions[c("Emissions")],
+                list(City = twocityMotorEmissions$fips,
+                     Year = twocityMotorEmissions$year),
+                sum
+        )
+twocityMotorEmissionsByFips$City <-
+        factor(
+                twocityMotorEmissionsByFips$City,
+                levels = c("06037", "24510"),
+                labels = c("Los Angeles, CA", "Baltimore City, MD")
+        )
 ```
+
+```{r}
+summary(baltimoreMotorEmissions$Emissions)
+summary(losangelesMotorEmissions$Emissions)
+```
+
+```{r echo=FALSE}
+plot6 <- qplot(
+        Year,
+        Emissions,
+        data = twocityMotorEmissionsByFips,
+        color = City,
+        xlab = "Year",
+        geom = "path",
+        ylab = "Motor vehicle PM2.5 emissions, tonn",
+        main = "Changes in Motor vehicle emissions from PM2.5
+        in Baltimore compred to Los Angeles County,
+        for the years 1999, 2002, 2005, and 2008"
+) + theme(plot.title = element_text(hjust = 0.5))
+print(plot6)
+invisible(dev.copy(
+                png,
+                filename = "Plot6.png",
+                width = 640,
+                height = 480
+        ))
+invisible(dev.off())
+```
+
+First noticeable observation is that overall motor vehicle emissions levels are significantly higher in LA compared to Baltimore. Change dynamics is also quite opposite. While PM2.5 from motor vehicles showed a steady decline in Baltimore, especially in the beginning of the period, in LA it was on the rise until 2005, then began to decline. However, even after lowering, the final level of emissions for Los Angeles in 2008 is slightly higher than it was in 1999.
