@@ -5,6 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+if(!require(ggplot2)) {install.packages("ggplot2")}
 ```
 
 ### Preparing Data
@@ -49,10 +50,16 @@ head(SCC)
 totalEmissions <- with(NEI, tapply(Emissions/1000,year,sum,na.rm=TRUE))
 ```
 ```{r echo=FALSE}
-par(mar=c(5,5,4,1))
-barplot(totalEmissions, xlab = "Year", ylab = "Total emissions, 1000 tonn", main="Total PM[2.5] emission from all sources \nfor the years 1999, 2002, 2005, and 2008")
-dev.copy(png, filename="Plot1.png")
-dev.off()
+par(mar = c(5, 5, 4, 1))
+barplot(
+        totalEmissions,
+        xlab = "Year",
+        ylab = "Total emissions, 1000 tonn",
+        main = "Total PM[2.5] emission from all sources
+        for the years 1999, 2002, 2005, and 2008"
+)
+invisible(dev.copy(png, filename = "Plot1.png"))
+invisible(dev.off())
 ```
 
 There is a clear downward trend in total emissions from PM2.5 in US in the years 1999, 2002, 2005, and 2008.
@@ -61,28 +68,85 @@ There is a clear downward trend in total emissions from PM2.5 in US in the years
 
 ```{r cache=TRUE}
 baltimoreEmissions <- NEI[NEI$fips == "24510",]
-baltimoreTotalEmissions <- with(baltimoreEmissions, tapply(Emissions/1000,year,sum,na.rm=TRUE))
+baltimoreTotalEmissions <- with(baltimoreEmissions, tapply(Emissions,year,sum,na.rm=TRUE))
 ```
 ```{r echo=FALSE}
-par(mar=c(5,5,5,1))
-barplot(baltimoreTotalEmissions, xlab = "Year", ylab = "Total emissions, 1000 tonn", main="PM2.5 emission from all sources \nin the Baltimore City, Maryland \nfor the years 1999, 2002, 2005, and 2008")
-dev.copy(png, filename="Plot2.png")
-dev.off()
+par(mar = c(5, 5, 5, 1))
+barplot(
+        baltimoreTotalEmissions,
+        xlab = "Year",
+        ylab = "Total emissions, tonn",
+        main = "PM2.5 emission from all sources
+        in the Baltimore City, Maryland
+        for the years 1999, 2002, 2005, and 2008"
+)
+invisible(dev.copy(png, filename = "Plot2.png"))
+invisible(dev.off())
 ```
+
+Yes, total emissions from PM2.5 decreased in the Baltimore, Maryland, during the period from 1999 to 2008. 
+However, it is seen that throughout the years the situation has not remained stable, and emissions peaked in 2005.
 
 ### 3. Of the four types of sources indicated by the 𝚝𝚢𝚙𝚎 (point, nonpoint, onroad, nonroad) variable, which of these four sources have seen decreases in emissions from 1999–2008 for Baltimore City? Which have seen increases in emissions from 1999–2008? Use the ggplot2 plotting system to make a plot answer this question.
 
-```{r}
-
+```{r cache=TRUE}
+baltimoreEmissions <- NEI[NEI$fips == "24510",]
+baltimoreEmissionsBySource <-
+        aggregate(
+                baltimoreEmissions[c("Emissions")],
+                list(Source = baltimoreEmissions$type, 
+                     Year = baltimoreEmissions$year),
+                sum
+        )
 ```
 
+```{r echo=FALSE}
+plot3 <- qplot(
+                Year,
+                Emissions,
+                data = baltimoreEmissionsBySource,
+                color = Source,
+                xlab = "Year",
+                geom = "path",
+                ylab = "Emissions of PM2.5, tonn",
+                main = "Sources of emissions from PM2.5 in Baltimore, for the years 1999, 2002, 2005, and 2008"
+        )
+        print(plot3)
+        invisible(dev.copy(
+                png,
+                filename = "Plot3.png",
+                width = 640,
+                height = 480
+        ))
+        invisible(dev.off())
+```
+
+Emissions for three of four source types (NON-ROAD, NONPOINT and ON-ROAD) have decreased in the end of the period (year 2008) compared to its beginning (year 1999).
+Also it can be seen that the most part of decrease occurred in the period from 1999 to 2002 for the same three sources.
+Source type POINT shown strong increase during the years 1999-2005, changed to sharp fall ended in 2008 almost on the same level as it showed in 1999.
 
 ### 4. Across the United States, how have emissions from coal combustion-related sources changed from 1999–2008?
 
-```{r}
-
+```{r cache=TRUE}
+coalSources <- SCC[grep("coal",SCC$Short.Name,ignore.case = TRUE),c("SCC","Short.Name")]
+coalEmissions <- NEI[NEI$SCC %in% coalSources$SCC,]
+coalTortalEmissions <- with(coalEmissions, tapply(Emissions/1000,year,sum,na.rm=TRUE))
+```
+```{r echo=FALSE}
+par(mar = c(5, 5, 5, 1))
+barplot(
+        totalEmissions,
+        xlab = "Year",
+        ylab = "Coal emissions, 1000 tonn",
+        main = "Total PM2.5 emissions in US
+        from Coal combustion-related sources
+        for the years 1999, 2002, 2005, and 2008"
+)
+invisible(dev.copy(png, filename = "Plot4.png"))
+invisible(dev.off())
 ```
 
+Coal combustion-related emissions decreased by half by 2008 compared to 1999, showing a steady decline throughout the period.
 
 ### 5. How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City?
 
