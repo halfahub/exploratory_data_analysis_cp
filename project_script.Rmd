@@ -7,7 +7,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Preparing Data
+### Preparing Data
 
 
 ```{r pm25}
@@ -45,17 +45,30 @@ head(SCC)
 
 ### 1. Have total emissions from PM2.5 decreased in the United States from 1999 to 2008? Using the base plotting system, make a plot showing the total PM2.5 emission from all sources for each of the years 1999, 2002, 2005, and 2008.
 
-```{r}
-
+```{r cache=TRUE}
+totalEmissions <- with(NEI, tapply(Emissions/1000,year,sum,na.rm=TRUE))
+```
+```{r echo=FALSE}
+par(mar=c(5,5,4,1))
+barplot(totalEmissions, xlab = "Year", ylab = "Total emissions, 1000 tonn", main="Total PM[2.5] emission from all sources \nfor the years 1999, 2002, 2005, and 2008")
+dev.copy(png, filename="Plot1.png")
+dev.off()
 ```
 
+There is a clear downward trend in total emissions from PM2.5 in US in the years 1999, 2002, 2005, and 2008.
 
 ### 2. Have total emissions from PM2.5 decreased in the Baltimore City, Maryland (𝚏𝚒𝚙𝚜 == "𝟸𝟺𝟻𝟷𝟶") from 1999 to 2008? Use the base plotting system to make a plot answering this question.
 
-```{r}
-
+```{r cache=TRUE}
+baltimoreEmissions <- NEI[NEI$fips == "24510",]
+baltimoreTotalEmissions <- with(baltimoreEmissions, tapply(Emissions/1000,year,sum,na.rm=TRUE))
 ```
-
+```{r echo=FALSE}
+par(mar=c(5,5,5,1))
+barplot(baltimoreTotalEmissions, xlab = "Year", ylab = "Total emissions, 1000 tonn", main="PM2.5 emission from all sources \nin the Baltimore City, Maryland \nfor the years 1999, 2002, 2005, and 2008")
+dev.copy(png, filename="Plot2.png")
+dev.off()
+```
 
 ### 3. Of the four types of sources indicated by the 𝚝𝚢𝚙𝚎 (point, nonpoint, onroad, nonroad) variable, which of these four sources have seen decreases in emissions from 1999–2008 for Baltimore City? Which have seen increases in emissions from 1999–2008? Use the ggplot2 plotting system to make a plot answer this question.
 

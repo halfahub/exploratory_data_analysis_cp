@@ -14,9 +14,10 @@ if (!file.exists("./tmp/pm25data.zip")){
 NEI <- readRDS("./pm25_data/summarySCC_PM25.rds")
 SCC <- readRDS("./pm25_data/Source_Classification_Code.rds")
 
-totalEmissions <- with(NEI, tapply(Emissions/1000,year,sum,na.rm=TRUE))
+baltimoreEmissions <- NEI[NEI$fips == "24510",]
+baltimoreTotalEmissions <- with(baltimoreEmissions, tapply(Emissions/1000,year,sum,na.rm=TRUE))
 
 par(mar=c(5,5,4,1))
-barplot(totalEmissions, xlab = "Year", ylab = "Total emissions, 1000 tonn", main="Total PM2.5 emission from all sources \nfor the years 1999, 2002, 2005, and 2008")
-dev.copy(png, filename="Plot1.png")
+barplot(baltimoreTotalEmissions, xlab = "Year", ylab = "Total emissions, 1000 tonn", main="PM2.5 emission from all sources \nin the Baltimore City, Maryland \nfor the years 1999, 2002, 2005, and 2008")
+dev.copy(png, filename="Plot2.png")
 dev.off()
