@@ -1,0 +1,85 @@
+---
+title: "DS4-EDA Course Project"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Preparing Data
+
+
+```{r pm25}
+URL <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
+
+if (!file.exists("./tmp")) dir.create("./tmp")
+if (!file.exists("./pm25_data")) dir.create("./pm25_data")
+
+if (!file.exists("./tmp/pm25data.zip")){
+        download.file(
+        URL, destfile = "./tmp/pm25data.zip"
+        )
+} else {
+        unzip("./tmp/pm25data.zip", exdir = "./pm25_data", overwrite = FALSE)
+}
+dir("./pm25_data/")
+
+
+```
+
+Each of the two files can be read using the 𝚛𝚎𝚊𝚍𝚁𝙳𝚂() function in R.
+
+```{r cache=TRUE}
+
+NEI <- readRDS("./pm25_data/summarySCC_PM25.rds")
+SCC <- readRDS("./pm25_data/Source_Classification_Code.rds")
+
+dim(NEI)
+head(NEI)
+
+dim(SCC)
+head(SCC)
+```
+
+
+### 1. Have total emissions from PM2.5 decreased in the United States from 1999 to 2008? Using the base plotting system, make a plot showing the total PM2.5 emission from all sources for each of the years 1999, 2002, 2005, and 2008.
+
+```{r}
+
+```
+
+
+### 2. Have total emissions from PM2.5 decreased in the Baltimore City, Maryland (𝚏𝚒𝚙𝚜 == "𝟸𝟺𝟻𝟷𝟶") from 1999 to 2008? Use the base plotting system to make a plot answering this question.
+
+```{r}
+
+```
+
+
+### 3. Of the four types of sources indicated by the 𝚝𝚢𝚙𝚎 (point, nonpoint, onroad, nonroad) variable, which of these four sources have seen decreases in emissions from 1999–2008 for Baltimore City? Which have seen increases in emissions from 1999–2008? Use the ggplot2 plotting system to make a plot answer this question.
+
+```{r}
+
+```
+
+
+### 4. Across the United States, how have emissions from coal combustion-related sources changed from 1999–2008?
+
+```{r}
+
+```
+
+
+### 5. How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City?
+
+```{r}
+
+```
+
+
+### 6. Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in Los Angeles County, California (𝚏𝚒𝚙𝚜 == "𝟶𝟼𝟶𝟹𝟽"). Which city has seen greater changes over time in motor vehicle emissions?
+
+```{r}
+
+```
